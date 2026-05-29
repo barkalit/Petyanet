@@ -1,0 +1,552 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+  <title>Петянет - Сетевой чат | www.petya.net</title>
+  <link rel="canonical" href="https://www.petya.net">
+  <meta name="description" content="Петянет - социальная сеть для общения. Чаты, группы, медиафайлы, поиск пользователей по @.">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background: radial-gradient(circle at 20% 30%, #1a472a, #0b2b1a);
+      font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      margin: 0;
+      padding: 20px;
+      position: relative;
+      overflow-x: hidden;
+      overflow-y: auto;
+    }
+
+    .christmas-bg {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 0;
+      overflow: hidden;
+    }
+
+    .floating-symbol {
+      position: absolute;
+      bottom: -80px;
+      font-size: 2.2rem;
+      opacity: 0.75;
+      animation: floatUp linear infinite;
+      user-select: none;
+      text-shadow: 0 0 8px rgba(255, 255, 200, 0.7);
+      will-change: transform;
+    }
+
+    @keyframes floatUp {
+      0% {
+        transform: translateY(0) rotate(0deg) scale(0.8);
+        opacity: 0.5;
+      }
+      25% {
+        opacity: 0.9;
+        transform: translateY(-25vh) rotate(12deg) scale(1);
+      }
+      50% {
+        transform: translateY(-50vh) rotate(-8deg) scale(1.1);
+        opacity: 0.9;
+      }
+      75% {
+        transform: translateY(-75vh) rotate(5deg) scale(0.9);
+        opacity: 0.75;
+      }
+      100% {
+        transform: translateY(-105vh) rotate(15deg) scale(0.7);
+        opacity: 0;
+      }
+    }
+
+    .glass-panel {
+      background: rgba(255, 255, 250, 0.85);
+      backdrop-filter: blur(14px);
+      background: linear-gradient(145deg, #fef9e7 0%, #f7e9cf 100%);
+      border-radius: 48px;
+      box-shadow: 
+        0 30px 50px rgba(0, 30, 10, 0.5),
+        inset 0 2px 15px rgba(255, 255, 200, 0.8),
+        inset 0 -3px 12px rgba(180, 40, 30, 0.3),
+        0 0 0 3px #d4af37;
+      border: 1px solid #b33e2c;
+      padding: 40px 35px 45px;
+      width: 100%;
+      max-width: 750px;
+      position: relative;
+      z-index: 10;
+      transition: all 0.3s ease;
+      animation: fadeSlideUp 0.8s cubic-bezier(0.23, 1, 0.32, 1);
+    }
+
+    @keyframes fadeSlideUp {
+      0% { opacity: 0; transform: translateY(40px); }
+      100% { opacity: 1; transform: translateY(0); }
+    }
+
+    .logo-area {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin-bottom: 28px;
+      animation: softGlowXmas 2.2s infinite alternate ease-in-out;
+      position: relative;
+    }
+
+    .logo-img {
+      width: 450px;
+      height: auto;
+      max-width: 100%;
+      filter: drop-shadow(0 14px 20px rgba(180, 40, 20, 0.55));
+      transition: transform 0.3s ease, filter 0.3s;
+      background: transparent;
+      border-radius: 28px;
+      padding: 10px;
+      background-clip: padding-box;
+      border: 4px solid #f5c542;
+      object-fit: contain;
+    }
+
+    .logo-img:hover {
+      transform: scale(1.02);
+      filter: drop-shadow(0 20px 28px rgba(200, 60, 30, 0.8));
+    }
+
+    @keyframes softGlowXmas {
+      0% { filter: drop-shadow(0 8px 18px #c41e3a); }
+      100% { filter: drop-shadow(0 22px 32px #f4b642); }
+    }
+
+    .search-section {
+      margin: 22px 0 32px;
+      animation: fadeSlideUp 0.9s ease;
+    }
+
+    .search-wrapper {
+      display: flex;
+      align-items: center;
+      background: #fffaf2;
+      border-radius: 55px;
+      padding: 8px 8px 8px 30px;
+      box-shadow: 
+        inset 0 2px 9px rgba(120, 30, 20, 0.2),
+        0 12px 24px rgba(100, 20, 10, 0.45),
+        0 0 0 3px #c0392b;
+      border: 1px solid #f1cf8e;
+      transition: all 0.25s ease;
+    }
+
+    .search-wrapper:focus-within {
+      box-shadow: 
+        inset 0 2px 10px rgba(150, 30, 30, 0.25),
+        0 14px 28px rgba(170, 50, 30, 0.7),
+        0 0 0 4px #e74c3c;
+      transform: scale(1.01);
+    }
+
+    .search-input {
+      flex: 1;
+      border: none;
+      background: transparent;
+      font-size: 1.4rem;
+      padding: 14px 8px;
+      outline: none;
+      color: #2e1e1a;
+      font-weight: 500;
+    }
+
+    .search-input::placeholder {
+      color: #9c6b5a;
+      font-style: italic;
+    }
+
+    .search-button {
+      background: linear-gradient(180deg, #e63946 0%, #b81c28 100%);
+      border: none;
+      border-radius: 45px;
+      padding: 14px 34px;
+      font-weight: bold;
+      font-size: 1.2rem;
+      color: #fff9e6;
+      text-shadow: 0 1px 2px #4a0c0c;
+      box-shadow: 
+        0 6px 14px rgba(160, 30, 20, 0.7),
+        inset 0 1px 8px #f8bc7c,
+        inset 0 -2px 5px rgba(0,0,0,0.3);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      letter-spacing: 0.5px;
+      transition: all 0.2s;
+      border: 1px solid #f5b042;
+      white-space: nowrap;
+    }
+
+    .search-button:hover {
+      background: linear-gradient(180deg, #f15a5a 0%, #c12a2a 100%);
+      box-shadow: 0 8px 18px #b33131, inset 0 1px 12px #ffd58c;
+      transform: scale(1.03);
+    }
+
+    .auth-box {
+      background: rgba(253, 245, 230, 0.8);
+      backdrop-filter: blur(6px);
+      border-radius: 38px;
+      padding: 20px 24px 12px;
+      margin: 28px 0 10px;
+      border: 1px solid #c0392b;
+      box-shadow: inset 0 2px 10px rgba(255,255,220,0.9), 0 8px 20px rgba(120, 30, 20, 0.4);
+    }
+
+    .tabs {
+      display: flex;
+      gap: 18px;
+      margin-bottom: 24px;
+      justify-content: center;
+    }
+
+    .tab-btn {
+      background: #b7956b;
+      border: none;
+      padding: 12px 32px;
+      border-radius: 32px;
+      font-weight: bold;
+      font-size: 1.05rem;
+      color: #2f1d0e;
+      cursor: pointer;
+      box-shadow: 0 4px 10px rgba(90, 30, 10, 0.4), inset 0 1px 5px #fae3bc;
+      transition: 0.25s;
+      border: 1px solid #8f5c3b;
+    }
+
+    .tab-btn.active {
+      background: linear-gradient(180deg, #d62e2e 0%, #a52020 100%);
+      color: #fff3cd;
+      border: 1px solid #f1c40f;
+      box-shadow: 0 0 18px #f39c12, inset 0 1px 8px #ffc978;
+      text-shadow: 0 1px 2px #3a0c0c;
+    }
+
+    .form-panel {
+      display: none;
+      flex-direction: column;
+      gap: 18px;
+      animation: fade 0.35s;
+    }
+
+    .form-panel.active-form {
+      display: flex;
+    }
+
+    @keyframes fade {
+      from { opacity: 0.3; transform: translateY(6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .input-group label {
+      font-size: 0.9rem;
+      font-weight: bold;
+      color: #561c1c;
+      text-transform: uppercase;
+    }
+
+    .input-field {
+      background: #fef7e9;
+      border: 1px solid #b1452a;
+      border-radius: 28px;
+      padding: 14px 20px;
+      font-size: 1rem;
+      outline: none;
+      box-shadow: inset 0 2px 8px rgba(150,40,20,0.15);
+      transition: 0.2s;
+    }
+
+    .input-field:focus {
+      border-color: #e67e22;
+      box-shadow: 0 0 14px #f1c40f, inset 0 1px 8px white;
+      background: #ffffff;
+    }
+
+    .auth-submit {
+      background: linear-gradient(180deg, #2e7d32 0%, #1b4d1e 100%);
+      border: none;
+      border-radius: 34px;
+      padding: 15px 20px;
+      color: #f1f9d2;
+      font-weight: bold;
+      font-size: 1.15rem;
+      text-shadow: 0 -1px 0 #0a2a0a;
+      box-shadow: 0 8px 16px rgba(20, 80, 20, 0.7), inset 0 1px 8px #b9e6a0;
+      cursor: pointer;
+      transition: 0.25s;
+      border: 1px solid #f1c40f;
+      margin-top: 6px;
+    }
+
+    .auth-submit:hover {
+      background: linear-gradient(180deg, #3e9142 0%, #236b26 100%);
+      box-shadow: 0 10px 22px #2d5a2d;
+    }
+
+    .user-greeting {
+      background: #d4edc9;
+      border-radius: 30px;
+      padding: 14px 22px;
+      margin-top: 22px;
+      text-align: center;
+      font-weight: bold;
+      color: #1e4a1e;
+      border: 1px solid #c0392b;
+      box-shadow: 0 5px 15px rgba(180, 40, 20, 0.4);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      font-size: 1.1rem;
+    }
+
+    .logout-link {
+      color: #a52a1f;
+      text-decoration: underline;
+      cursor: pointer;
+      margin-left: 12px;
+      font-weight: bold;
+    }
+
+    .footer-note {
+      text-align: center;
+      margin-top: 28px;
+      font-size: 0.85rem;
+      color: #4a2c1a;
+      text-shadow: 0 1px 0 #ffe0b0;
+    }
+  </style>
+</head>
+<body>
+  <div class="christmas-bg" id="christmasBg"></div>
+
+  <div class="glass-panel">
+    <div class="logo-area">
+      <img src="logo.png" alt="Петянет - www.petya.net" class="logo-img" onerror="this.onerror=null; this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22280%22 height=%22120%22 viewBox=%220 0 280 120%22%3E%3Crect width=%22280%22 height=%22120%22 rx=%2222%22 fill=%22%23b33030%22 stroke=%22%23f4d03f%22 stroke-width=%226%22/%3E%3Ctext x=%22140%22 y=%2282%22 font-size=%2260%22 text-anchor=%22middle%22 fill=%22%23fef9e7%22 font-family=%22Arial Black%22%3Ewww.petya.net%3C/text%3E%3C/svg%3E';">
+    </div>
+
+    <div class="search-section">
+      <div class="search-wrapper">
+        <input type="text" class="search-input" placeholder="Новогодний поиск..." id="searchInput" autofocus>
+        <button class="search-button" id="searchButton">🎅 Найти</button>
+      </div>
+    </div>
+
+    <div class="auth-box" id="authBox">
+      <div class="tabs">
+        <button class="tab-btn active" id="loginTabBtn">🎁 Вход</button>
+        <button class="tab-btn" id="registerTabBtn">⭐ Регистрация</button>
+      </div>
+      <div class="form-panel active-form" id="loginForm">
+        <div class="input-group"><label>📧 Почта</label><input type="email" class="input-field" id="loginEmail" placeholder="dedmoroz@mail.ru"></div>
+        <div class="input-group"><label>🔒 Пароль</label><input type="password" class="input-field" id="loginPassword" placeholder="••••••••"></div>
+        <button class="auth-submit" id="loginSubmit">Войти в аккаунт</button>
+      </div>
+      <div class="form-panel" id="registerForm">
+        <div class="input-group"><label>👤 Имя</label><input type="text" class="input-field" id="regName" placeholder="Снегурочка"></div>
+        <div class="input-group"><label>📧 Почта</label><input type="email" class="input-field" id="regEmail" placeholder="snow@newyear.ru"></div>
+        <div class="input-group"><label>🔒 Пароль</label><input type="password" class="input-field" id="regPassword" placeholder="Минимум 6 символов"></div>
+        <button class="auth-submit" id="registerSubmit">Зарегистрироваться</button>
+      </div>
+    </div>
+
+    <div class="user-greeting" id="userGreeting">
+      <span id="greetingText">Сайт от Пети</span>
+      <span class="logout-link" id="logoutBtn">(Выйти)</span>
+    </div>
+    <div class="footer-note">🎄 Добро пожаловать в ПЕТЯНЕТ! 🎄</div>
+  </div>
+
+  <script>
+    (function() {
+      function createFloatingSymbols() {
+        const container = document.getElementById('christmasBg');
+        if (!container) return;
+        const symbols = ['🎄', '🎁', '❄️', '⭐', '🦌', '⛄', '🕯️', '🔔', '🧦', '🌟', '🎅', '☃️', '🍾', '🎀'];
+        const count = 28;
+
+        for (let i = 0; i < count; i++) {
+          const span = document.createElement('span');
+          span.className = 'floating-symbol';
+          const randomSymbol = symbols[Math.floor(Math.random() * symbols.length)];
+          span.textContent = randomSymbol;
+          
+          const left = Math.random() * 100;
+          const size = 1.6 + Math.random() * 2.8;
+          const duration = 9 + Math.random() * 14;
+          const delay = Math.random() * 10;
+          
+          span.style.left = left + '%';
+          span.style.fontSize = size + 'rem';
+          span.style.animationDuration = duration + 's';
+          span.style.animationDelay = delay + 's';
+          
+          container.appendChild(span);
+        }
+      }
+
+      createFloatingSymbols();
+
+      const loginTab = document.getElementById('loginTabBtn');
+      const registerTab = document.getElementById('registerTabBtn');
+      const loginForm = document.getElementById('loginForm');
+      const registerForm = document.getElementById('registerForm');
+      const loginSubmit = document.getElementById('loginSubmit');
+      const registerSubmit = document.getElementById('registerSubmit');
+      const userGreeting = document.getElementById('userGreeting');
+      const greetingText = document.getElementById('greetingText');
+      const logoutBtn = document.getElementById('logoutBtn');
+      const authBox = document.getElementById('authBox');
+      const searchButton = document.getElementById('searchButton');
+      const searchInput = document.getElementById('searchInput');
+
+      const loginEmail = document.getElementById('loginEmail');
+      const loginPassword = document.getElementById('loginPassword');
+      const regName = document.getElementById('regName');
+      const regEmail = document.getElementById('regEmail');
+      const regPassword = document.getElementById('regPassword');
+
+      let currentUser = null;
+
+      function loadUserFromStorage() {
+        const stored = localStorage.getItem('newyear2007user');
+        if (stored) {
+          try {
+            currentUser = JSON.parse(stored);
+            showUserUI(currentUser);
+            setTimeout(() => {
+              window.location.href = 'Chat/index.html';
+            }, 500);
+          } catch (e) {
+            localStorage.removeItem('newyear2007user');
+            currentUser = null;
+            showAuthUI();
+          }
+        } else {
+          showAuthUI();
+        }
+      }
+
+      loginTab.addEventListener('click', () => {
+        loginTab.classList.add('active');
+        registerTab.classList.remove('active');
+        loginForm.classList.add('active-form');
+        registerForm.classList.remove('active-form');
+      });
+
+      registerTab.addEventListener('click', () => {
+        registerTab.classList.add('active');
+        loginTab.classList.remove('active');
+        registerForm.classList.add('active-form');
+        loginForm.classList.remove('active-form');
+      });
+
+      function showAuthUI() {
+        authBox.style.display = 'block';
+        userGreeting.style.display = 'none';
+      }
+
+      function showUserUI(user) {
+        authBox.style.display = 'none';
+        userGreeting.style.display = 'flex';
+        greetingText.textContent = `🎄 С праздником, ${user.name || user.email}!`;
+      }
+
+      function saveUser(user) {
+        localStorage.setItem('newyear2007user', JSON.stringify(user));
+        currentUser = user;
+        showUserUI(user);
+        setTimeout(() => {
+          window.location.href = 'Chat/index.html';
+        }, 1000);
+      }
+
+      logoutBtn.addEventListener('click', () => {
+        localStorage.removeItem('newyear2007user');
+        currentUser = null;
+        showAuthUI();
+        loginEmail.value = '';
+        loginPassword.value = '';
+        regName.value = '';
+        regEmail.value = '';
+        regPassword.value = '';
+        loginTab.click();
+      });
+
+      loginSubmit.addEventListener('click', (e) => {
+        e.preventDefault();
+        const email = loginEmail.value.trim();
+        const password = loginPassword.value.trim();
+        if (!email || !password) return alert('🎅 Заполните все поля.');
+        const usersDB = JSON.parse(localStorage.getItem('xmas_users2007') || '[]');
+        const found = usersDB.find(u => u.email === email && u.password === password);
+        if (found) {
+          saveUser({ name: found.name, email: found.email });
+          alert('✅ С возвращением!');
+        } else {
+          alert('❌ Неверные данные.');
+        }
+      });
+
+      registerSubmit.addEventListener('click', (e) => {
+        e.preventDefault();
+        const name = regName.value.trim();
+        const email = regEmail.value.trim();
+        const password = regPassword.value.trim();
+        if (!name || !email || !password) return alert('🎁 Все поля обязательны.');
+        if (password.length < 6) return alert('🔐 Пароль от 6 символов.');
+        if (!email.includes('@') || !email.includes('.')) return alert('📧 Некорректный email.');
+        const usersDB = JSON.parse(localStorage.getItem('xmas_users2007') || '[]');
+        if (usersDB.some(u => u.email === email)) {
+          alert('📌 Такой email уже есть.');
+          loginTab.click();
+          loginEmail.value = email;
+          return;
+        }
+        usersDB.push({ name, email, password, username: name.toLowerCase().replace(/\s/g, ''), bio: '', avatar: null });
+        localStorage.setItem('xmas_users2007', JSON.stringify(usersDB));
+        saveUser({ name, email });
+        alert('🎉 Регистрация успешна!');
+        regName.value = ''; regEmail.value = ''; regPassword.value = '';
+      });
+
+      function performSearch() {
+        const query = searchInput.value.trim();
+        if (!query) return alert('🎄 Введите запрос.');
+        window.open(`https://www.google.com/search?q=${encodeURIComponent(query)}`, '_blank');
+      }
+
+      searchButton.addEventListener('click', performSearch);
+      searchInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') performSearch(); });
+
+      if (!localStorage.getItem('xmas_users2007')) {
+        localStorage.setItem('xmas_users2007', JSON.stringify([
+          { name: 'Дед Мороз', email: 'moroz@xmas.ru', password: '123456' },
+          { name: 'Снегурочка', email: 'snow@newyear.ru', password: 'password' }
+        ]));
+      }
+
+      loadUserFromStorage();
+    })();
+  </script>
+</body>
+</html>
